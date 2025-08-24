@@ -1,0 +1,869 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Apollo.io API",
+    "description": "Apollo.io API for people and organization enrichment, search, and data retrieval",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Apollo.io API Documentation",
+      "url": "https://docs.apollo.io/"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apollo.io/api/v1",
+      "description": "Apollo.io API v1"
+    },
+    {
+      "url": "https://api.apollo.io/v1",
+      "description": "Apollo.io API v1 (alternative)"
+    },
+    {
+      "url": "https://app.apollo.io/api/v1",
+      "description": "Apollo.io App API v1"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/people/match": {
+      "post": {
+        "summary": "People Enrichment",
+        "description": "Use the People Enrichment endpoint to enrich data for 1 person",
+        "operationId": "peopleEnrichment",
+        "tags": ["People"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeopleEnrichmentRequest"
+              },
+              "examples": {
+                "byName": {
+                  "summary": "Enrich by name",
+                  "value": {
+                    "first_name": "Tim",
+                    "last_name": "Zheng"
+                  }
+                },
+                "byEmail": {
+                  "summary": "Enrich by email",
+                  "value": {
+                    "email": "tim@apollo.io"
+                  }
+                },
+                "byCompany": {
+                  "summary": "Enrich by name and company",
+                  "value": {
+                    "first_name": "Tim",
+                    "last_name": "Zheng",
+                    "domain": "apollo.io"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful enrichment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonEnrichmentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/organizations/enrich": {
+      "get": {
+        "summary": "Organization Enrichment",
+        "description": "Use the Organization Enrichment endpoint to enrich data for 1 company",
+        "operationId": "organizationEnrichment",
+        "tags": ["Organizations"],
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "query",
+            "description": "Company domain",
+            "schema": {
+              "type": "string"
+            },
+            "example": "apollo.io"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Company name",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Apollo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful enrichment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationEnrichmentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/mixed_people/search": {
+      "post": {
+        "summary": "People Search",
+        "description": "Use the People Search endpoint to find people",
+        "operationId": "peopleSearch",
+        "tags": ["People"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeopleSearchRequest"
+              },
+              "examples": {
+                "byCompanyAndTitle": {
+                  "summary": "Search by company and title",
+                  "value": {
+                    "q_organization_domains_list": ["apollo.io"],
+                    "person_titles": ["Marketing Manager"],
+                    "person_seniorities": ["vp"]
+                  }
+                },
+                "byOrganizationIds": {
+                  "summary": "Search by organization IDs",
+                  "value": {
+                    "organization_ids": ["5e60b6381c85b4008c83"],
+                    "page": 1,
+                    "limit": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful search",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeopleSearchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/mixed_companies/search": {
+      "post": {
+        "summary": "Organization Search",
+        "description": "Use the Organization Search endpoint to find organizations",
+        "operationId": "organizationSearch",
+        "tags": ["Organizations"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationSearchRequest"
+              },
+              "examples": {
+                "byLocation": {
+                  "summary": "Search by location",
+                  "value": {
+                    "organization_locations": ["Japan", "Ireland"]
+                  }
+                },
+                "byName": {
+                  "summary": "Search by name",
+                  "value": {
+                    "q_organization_name": "Apollo",
+                    "page": 1,
+                    "limit": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful search",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationSearchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/organizations/{organizationId}/job_postings": {
+      "get": {
+        "summary": "Organization Job Postings",
+        "description": "Use the Organization Job Postings endpoint to find job postings for a specific organization",
+        "operationId": "organizationJobPostings",
+        "tags": ["Organizations"],
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "description": "Apollo.io organization ID",
+            "schema": {
+              "type": "string"
+            },
+            "example": "5e60b6381c85b4008c83"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of job postings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPostingsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/mixed_people/add_to_my_prospects": {
+      "post": {
+        "summary": "Get Person Email",
+        "description": "Get email address for a person using their Apollo ID by adding them to prospects",
+        "operationId": "getPersonEmail",
+        "tags": ["People"],
+        "servers": [
+          {
+            "url": "https://app.apollo.io/api/v1",
+            "description": "Apollo.io App API v1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddToProspectsRequest"
+              },
+              "example": {
+                "entity_ids": ["5e60b6381c85b4008c83"],
+                "analytics_context": "Searcher: Individual Add Button",
+                "skip_fetching_people": true,
+                "cta_name": "Access email",
+                "cacheKey": 1640995200000
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful email retrieval",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddToProspectsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Api-Key",
+        "description": "Apollo.io API Key"
+      }
+    },
+    "schemas": {
+      "PeopleEnrichmentRequest": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "description": "Person's first name"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Person's last name"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Person's email address"
+          },
+          "domain": {
+            "type": "string",
+            "description": "Company domain"
+          },
+          "organization_name": {
+            "type": "string",
+            "description": "Organization name"
+          },
+          "linkedin_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Person's LinkedIn profile URL"
+          }
+        },
+        "additionalProperties": true
+      },
+      "PersonEnrichmentResponse": {
+        "type": "object",
+        "properties": {
+          "person": {
+            "$ref": "#/components/schemas/Person"
+          }
+        }
+      },
+      "OrganizationEnrichmentResponse": {
+        "type": "object",
+        "properties": {
+          "organization": {
+            "$ref": "#/components/schemas/Organization"
+          }
+        }
+      },
+      "PeopleSearchRequest": {
+        "type": "object",
+        "properties": {
+          "q_organization_domains_list": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of organization domains to search within"
+          },
+          "person_titles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of job titles to search for"
+          },
+          "person_seniorities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of seniority levels to search for"
+          },
+          "organization_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of organization IDs to search within"
+          },
+          "contact_email_status_v2": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Contact email status filter"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1,
+            "description": "Page number for pagination"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "default": 25,
+            "description": "Number of results per page"
+          }
+        },
+        "additionalProperties": true
+      },
+      "PeopleSearchResponse": {
+        "type": "object",
+        "properties": {
+          "people": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Person"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        }
+      },
+      "OrganizationSearchRequest": {
+        "type": "object",
+        "properties": {
+          "q_organization_domains_list": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of organization domains to search for"
+          },
+          "organization_locations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of organization locations to search for"
+          },
+          "q_organization_name": {
+            "type": "string",
+            "description": "Organization name to search for"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1,
+            "description": "Page number for pagination"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "default": 25,
+            "description": "Number of results per page"
+          }
+        },
+        "additionalProperties": true
+      },
+      "OrganizationSearchResponse": {
+        "type": "object",
+        "properties": {
+          "organizations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Organization"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        }
+      },
+      "JobPostingsResponse": {
+        "type": "object",
+        "properties": {
+          "job_postings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobPosting"
+            }
+          }
+        }
+      },
+      "AddToProspectsRequest": {
+        "type": "object",
+        "required": ["entity_ids"],
+        "properties": {
+          "entity_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of Apollo person IDs"
+          },
+          "analytics_context": {
+            "type": "string",
+            "description": "Analytics context for the request"
+          },
+          "skip_fetching_people": {
+            "type": "boolean",
+            "description": "Whether to skip fetching people data"
+          },
+          "cta_name": {
+            "type": "string",
+            "description": "Call-to-action name"
+          },
+          "cacheKey": {
+            "type": "integer",
+            "description": "Cache key timestamp"
+          }
+        }
+      },
+      "AddToProspectsResponse": {
+        "type": "object",
+        "properties": {
+          "contacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "description": "Contact's email address"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Person": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Apollo person ID"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "First name"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Last name"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full name"
+          },
+          "linkedin_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "LinkedIn profile URL"
+          },
+          "title": {
+            "type": "string",
+            "description": "Job title"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email address"
+          },
+          "organization": {
+            "$ref": "#/components/schemas/Organization"
+          },
+          "employment_history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Employment"
+            }
+          }
+        }
+      },
+      "Organization": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Apollo organization ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Organization name"
+          },
+          "website_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Organization website URL"
+          },
+          "linkedin_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Organization LinkedIn URL"
+          },
+          "domain": {
+            "type": "string",
+            "description": "Organization domain"
+          },
+          "industry": {
+            "type": "string",
+            "description": "Industry"
+          },
+          "founded_year": {
+            "type": "integer",
+            "description": "Year founded"
+          },
+          "estimated_num_employees": {
+            "type": "integer",
+            "description": "Estimated number of employees"
+          },
+          "publicly_traded_symbol": {
+            "type": "string",
+            "description": "Stock symbol if publicly traded"
+          },
+          "primary_phone": {
+            "$ref": "#/components/schemas/Phone"
+          },
+          "headquarters": {
+            "$ref": "#/components/schemas/Location"
+          }
+        }
+      },
+      "Employment": {
+        "type": "object",
+        "properties": {
+          "organization": {
+            "$ref": "#/components/schemas/Organization"
+          },
+          "title": {
+            "type": "string",
+            "description": "Job title"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Employment start date"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Employment end date"
+          },
+          "current": {
+            "type": "boolean",
+            "description": "Whether this is current employment"
+          }
+        }
+      },
+      "JobPosting": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Job posting ID"
+          },
+          "title": {
+            "type": "string",
+            "description": "Job title"
+          },
+          "description": {
+            "type": "string",
+            "description": "Job description"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "posted_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date posted"
+          },
+          "job_type": {
+            "type": "string",
+            "description": "Type of job (full-time, part-time, etc.)"
+          },
+          "seniority_level": {
+            "type": "string",
+            "description": "Seniority level"
+          }
+        }
+      },
+      "Phone": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "string",
+            "description": "Phone number"
+          },
+          "sanitized_number": {
+            "type": "string",
+            "description": "Sanitized phone number"
+          }
+        }
+      },
+      "Location": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Location name"
+          },
+          "street_address": {
+            "type": "string",
+            "description": "Street address"
+          },
+          "city": {
+            "type": "string",
+            "description": "City"
+          },
+          "state": {
+            "type": "string",
+            "description": "State or province"
+          },
+          "postal_code": {
+            "type": "string",
+            "description": "Postal code"
+          },
+          "country": {
+            "type": "string",
+            "description": "Country"
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Current page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Results per page"
+          },
+          "total_entries": {
+            "type": "integer",
+            "description": "Total number of entries"
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "Total number of pages"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "error_code": {
+            "type": "string",
+            "description": "Error code"
+          }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Bad request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized - Invalid API key",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "RateLimitExceeded": {
+        "description": "Rate limit exceeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "People",
+      "description": "People-related endpoints for enrichment and search"
+    },
+    {
+      "name": "Organizations",
+      "description": "Organization-related endpoints for enrichment, search, and job postings"
+    }
+  ]
+}
